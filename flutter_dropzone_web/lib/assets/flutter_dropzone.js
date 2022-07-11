@@ -51,6 +51,8 @@ class FlutterDropzone {
               var file = item.getAsFile();
               if (this.onDrop != null) this.onDrop(event, file);
               files.push(file);
+            } else {
+              if (this.onLeave != null) this.onLeave(event);
             }
             break;
 
