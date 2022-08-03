@@ -19,23 +19,29 @@ class FlutterDropzonePlugin extends FlutterDropzonePlatform {
   static void registerWith(Registrar registrar) {
     final self = FlutterDropzonePlugin();
     _isReady = _readyCompleter.future;
-    html.window.addEventListener('flutter_dropzone_web_ready', (_) {
-      if (!_readyCompleter.isCompleted) _readyCompleter.complete(true);
-    });
+    html.window.addEventListener(
+      'flutter_dropzone_web_ready',
+      (_) {
+        if (!_readyCompleter.isCompleted) _readyCompleter.complete(true);
+      },
+    );
     FlutterDropzonePlatform.instance = self;
 
     // ignore: undefined_prefixed_name
     ui.platformViewRegistry.registerViewFactory(
-        'com.creativephotocloud.plugins/dropzone', (viewId) {
-      final view = _views[viewId] = FlutterDropzoneView(viewId);
-      return view.container;
-    });
+      'com.creativephotocloud.plugins/dropzone',
+      (viewId) {
+        final view = _views[viewId] = FlutterDropzoneView(viewId);
+        return view.container;
+      },
+    );
 
-    html.document.body!.append(html.ScriptElement()
-      ..src =
-          'assets/packages/flutter_dropzone_web/assets/flutter_dropzone.js' // ignore: unsafe_html
-      ..type = 'application/javascript'
-      ..defer = true);
+    html.document.body!.append(
+      html.ScriptElement()
+        ..src = 'assets/packages/flutter_dropzone_web/assets/flutter_dropzone.js' // ignore: unsafe_html
+        ..type = 'application/javascript'
+        ..defer = true,
+    );
   }
 
   @override
@@ -59,8 +65,7 @@ class FlutterDropzonePlugin extends FlutterDropzonePlatform {
   }
 
   @override
-  Future<List<dynamic>> pickFiles(bool multiple,
-      {List<String> mime = const [], required int viewId}) {
+  Future<List<dynamic>> pickFiles(bool multiple, {List<String> mime = const [], required int viewId}) {
     return _views[viewId]!.pickFiles(multiple, mime);
   }
 
@@ -80,8 +85,7 @@ class FlutterDropzonePlugin extends FlutterDropzonePlatform {
   }
 
   @override
-  Future<DateTime> getFileLastModified(dynamic htmlFile,
-      {required int viewId}) {
+  Future<DateTime> getFileLastModified(dynamic htmlFile, {required int viewId}) {
     return _views[viewId]!.getFileLastModified(htmlFile);
   }
 
@@ -107,21 +111,23 @@ class FlutterDropzonePlugin extends FlutterDropzonePlatform {
 
   @override
   Widget buildView(
-          Map<String, dynamic> creationParams,
-          Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers,
-          PlatformViewCreatedCallback onPlatformViewCreated) =>
-      FutureBuilder<bool>(
-        future: _isReady,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return HtmlElementView(
-              viewType: 'com.creativephotocloud.plugins/dropzone',
-              onPlatformViewCreated: onPlatformViewCreated,
-            );
-          } else if (snapshot.hasError)
-            return const Center(child: Text('Error loading library'));
-          else
-            return const Center(child: CircularProgressIndicator());
-        },
-      );
+    Map<String, dynamic> creationParams,
+    Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers,
+    PlatformViewCreatedCallback onPlatformViewCreated,
+  ) {
+    return FutureBuilder<bool>(
+      future: _isReady,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return HtmlElementView(
+            viewType: 'com.creativephotocloud.plugins/dropzone',
+            onPlatformViewCreated: onPlatformViewCreated,
+          );
+        } else if (snapshot.hasError)
+          return const Center(child: Text('Error loading library'));
+        else
+          return const Center(child: CircularProgressIndicator());
+      },
+    );
+  }
 }
