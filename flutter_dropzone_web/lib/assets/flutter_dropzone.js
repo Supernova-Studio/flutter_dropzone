@@ -40,9 +40,9 @@ class FlutterDropzone {
   drop_handler(event) {
     event.preventDefault();
 
-    var files = [];
-    var strings = [];
-    if (event.dataTransfer.items) {
+    if (event.dataTransfer.items.length < 1) {
+      if (this.onError != null) this.onError("Empty data transfer");
+    } else if (event.dataTransfer.items.length == 1) {
       for (var i = 0; i < event.dataTransfer.items.length; i++) {
         var item = event.dataTransfer.items[i];
         switch (item.kind) {
@@ -50,7 +50,6 @@ class FlutterDropzone {
             if (this.dropMIME == null || this.dropMIME.includes(item.type)) {
               var file = item.getAsFile();
               if (this.onDrop != null) this.onDrop(event, file);
-              files.push(file);
             } else {
               if (this.onLeave != null) this.onLeave(event);
             }
@@ -60,6 +59,31 @@ class FlutterDropzone {
             const that = this;
             item.getAsString(function (text) {
               if (that.onDrop != null) that.onDrop(event, text);
+            });
+            break;
+
+          default:
+            if (this.onError != null) this.onError("Wrong type: ${item.kind}");
+            break;
+        }
+      }
+    } else if (this.onDropMultiple != null) {
+      var files = [];
+      var strings = [];
+
+      for (var i = 0; i < event.dataTransfer.items.length; i++) {
+        var item = event.dataTransfer.items[i];
+        switch (item.kind) {
+          case "file":
+            if (this.dropMIME == null || this.dropMIME.includes(item.type)) {
+              var file = item.getAsFile();
+              files.push(file);
+            }
+            break;
+
+          case "string":
+            const that = this;
+            item.getAsString(function (text) {
               strings.push(text);
             });
             break;
@@ -69,16 +93,33 @@ class FlutterDropzone {
             break;
         }
       }
-    } else {
-      for (var i = 0; i < ev.dataTransfer.files.length; i++)
-        var file = event.dataTransfer.files[i];
-        if (this.onDrop != null) this.onDrop(event, file);
-        files.push(file);
-    }
 
-    if (this.onDropMultiple != null) {
       if (files.length > 0) this.onDropMultiple(event, files);
       if (strings.length > 0) this.onDropMultiple(event, strings);
+    } else {
+      for (var i = 0; i < event.dataTransfer.items.length; i++) {
+        var item = event.dataTransfer.items[i];
+        switch (item.kind) {
+          case "file":
+            if (this.dropMIME == null || this.dropMIME.includes(item.type)) {
+              var file = item.getAsFile();
+              if (this.onDrop != null) this.onDrop(event, file);
+            } else {
+              if (this.onLeave != null) this.onLeave(event);
+            }
+            break;
+
+          case "string":
+            const that = this;
+            item.getAsString(function (text) {
+              if (that.onDrop != null) that.onDrop(event, text);
+            });
+            break;
+
+          default:
+            if (this.onError != null) this.onError("Wrong type: ${item.kind}");
+            break;
+        }
     }
   }
 
