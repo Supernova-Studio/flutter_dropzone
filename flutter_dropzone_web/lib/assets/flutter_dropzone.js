@@ -41,10 +41,7 @@ class FlutterDropzone {
     event.preventDefault();
 
     // Handle array length and onMultipleDrop callback availability
-    if (event.dataTransfer.items.length < 1) {
-      // No dropped items in dataTransfer object
-      if (this.onError != null) this.onError("Empty data transfer");
-    } else if (event.dataTransfer.items.length == 1) {
+    if (event.dataTransfer.items.length == 1) {
       // Only one dropped item
       var item = event.dataTransfer.items[0];
 
@@ -83,7 +80,6 @@ class FlutterDropzone {
             break;
 
           case "string":
-            const that = this;
             item.getAsString(function (text) {
               strings.push(text);
             });
