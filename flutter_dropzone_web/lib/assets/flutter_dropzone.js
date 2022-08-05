@@ -117,6 +117,7 @@ class FlutterDropzone {
             break;
         }
     }
+    }
 
     if (this.onLeave != null) this.onLeave(event);
   }
